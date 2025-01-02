@@ -1,9 +1,9 @@
 package parsix.core
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
 
 internal class ParseEvalThenKtTest {
     sealed class Attribute
@@ -18,7 +18,7 @@ internal class ParseEvalThenKtTest {
     @Test
     fun `it parses the int type`() {
         assertEquals(
-            Ok(IntAttribute(10)),
+            Success(IntAttribute(10)),
             this.mkParse().invoke(
                 this.mkMap("int", 10)
             )
@@ -28,7 +28,7 @@ internal class ParseEvalThenKtTest {
     @Test
     fun `it parses the str type`() {
         assertEquals(
-            Ok(StrAttribute("hello")),
+            Success(StrAttribute("hello")),
             this.mkParse().invoke(
                 this.mkMap("str", "hello")
             )

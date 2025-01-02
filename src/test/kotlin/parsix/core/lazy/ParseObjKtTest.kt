@@ -1,13 +1,13 @@
 package parsix.core.lazy
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import parsix.core.PropError
 import parsix.core.curry
 import parsix.core.parseInto
 import parsix.core.succeed
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
 import parsix.test.TestError
 import parsix.test.neverCalled
 
@@ -18,7 +18,7 @@ internal class ParseObjKtTest {
     @Test
     fun `it successfully parses the object`() {
         assertEquals(
-            Ok(TestDst("ok", 10)),
+            Success(TestDst("ok", 10)),
             parseInto(TestSrc::class, ::TestDst.curry())
                 .lazyRequired(TestSrc::a, succeed("ok"))
                 .lazyOptional(TestSrc::b, succeed(10))

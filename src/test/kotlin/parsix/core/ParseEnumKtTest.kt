@@ -1,9 +1,9 @@
 package parsix.core
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
 
 internal class ParseEnumKtTest {
     enum class TestEnum(override val key: String) : ParsableEnum {
@@ -14,7 +14,7 @@ internal class ParseEnumKtTest {
     @Test
     fun `it returns Test1 on one`() {
         assertEquals(
-            Ok(TestEnum.Test1),
+            Success(TestEnum.Test1),
             parseEnum<TestEnum>()("one")
         )
     }
@@ -22,7 +22,7 @@ internal class ParseEnumKtTest {
     @Test
     fun `it returns Test2 on two`() {
         assertEquals(
-            Ok(TestEnum.Test2),
+            Success(TestEnum.Test2),
             parseEnum<TestEnum>()("two")
         )
     }

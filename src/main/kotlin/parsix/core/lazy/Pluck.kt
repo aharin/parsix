@@ -1,9 +1,9 @@
 package parsix.core.lazy
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import parsix.core.Parse
 import parsix.core.Parsed
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
 
 /**
  * This is the building block for complex data structures.
@@ -28,7 +28,7 @@ import parsix.fp.result.Ok
  */
 fun <I, A, B> Parse<I, (A) -> B>.lazyPluck(parse: Parse<I, A>): Parse<I, B> =
     { inp ->
-        lazyLift2(parse(inp), { this(inp) }) { a, f -> Ok(f(a)) }
+        lazyLift2(parse(inp), { this(inp) }) { a, f -> Success(f(a)) }
     }
 
 @JvmName("lazyFlatPluck")
@@ -43,13 +43,15 @@ inline fun <A, B, O> lazyLift2(
     crossinline f: (A, B) -> Parsed<O>
 ): Parsed<O> =
     when (pa) {
-        is Ok ->
+        is Success ->
             when (val pb = lazyB()) {
-                is Ok ->
+                is Success ->
                     f(pa.value, pb.value)
+
                 is Failure ->
                     pb
             }
+
         is Failure ->
             pa
     }

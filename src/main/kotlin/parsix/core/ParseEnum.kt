@@ -1,7 +1,8 @@
 package parsix.core
 
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
+
 
 /**
  * Models an Enum that can be parsed
@@ -23,5 +24,5 @@ inline fun <reified T> parseEnum(): Parse<String, T>
     where T : Enum<T>, T : ParsableEnum {
     val map = enumValues<T>().associateBy { it.key }
 
-    return { inp -> map[inp]?.let(::Ok) ?: Failure(EnumError(inp, map.keys)) }
+    return { inp -> map[inp]?.let(::Success) ?: Failure(EnumError(inp, map.keys)) }
 }

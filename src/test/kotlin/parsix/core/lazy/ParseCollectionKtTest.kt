@@ -1,19 +1,19 @@
 package parsix.core.lazy
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import parsix.core.IndexError
 import parsix.core.Parse
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
 import parsix.test.TestError
 
 internal class ParseCollectionKtTest {
     @Test
     fun `it parses all items when successful`() {
         assertEquals(
-            Ok(listOf("1", "2", "3")),
-            lazyManyOf { inp: Int -> Ok(inp.toString()) }
+            Success(listOf("1", "2", "3")),
+            lazyManyOf { inp: Int -> Success(inp.toString()) }
                 .invoke(listOf(1, 2, 3))
         )
     }
@@ -24,7 +24,7 @@ internal class ParseCollectionKtTest {
             if (inp == 2)
                 TestError.of("failed")
             else
-                Ok(inp.toString())
+                Success(inp.toString())
         }
 
         assertEquals(

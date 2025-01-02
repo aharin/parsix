@@ -1,6 +1,6 @@
 package parsix.core
 
-import parsix.fp.result.mapError
+import dev.forkhandles.result4k.mapFailure
 
 /**
  * Make a parser that will extract a key from a [Map] and [parse] it.
@@ -11,7 +11,7 @@ fun <O> parseKey(
     parse: Parse<Any?, O>
 ): Parse<Map<String, Any?>, O> =
     { inp ->
-        parse(inp[key]).mapError {
+        parse(inp[key]).mapFailure {
             KeyError(key, it)
         }
     }

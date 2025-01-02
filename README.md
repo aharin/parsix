@@ -66,8 +66,8 @@ Instead of *just* validating, we should **parse** the input into a shape that ma
 In Parsix, the previous example would become:
 ```kotlin
 import parsix.core.Parse
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 
 @JvmInline
 value class Email(val email: String)
@@ -77,7 +77,7 @@ val parseEmail: Parse<String, Email> =
 
 fun storeEmailEndpoint(inp: String) {
     when (val parsed = parseEmail(inp)) {
-        is Ok ->
+        is Success ->
             storeEmail(parsed.value)
 
         is Failure ->
@@ -154,7 +154,7 @@ val parseEmail: Parse<String, Email>
 
 fun validateEmail(str: String): bool =
     when (parseEmail(str)) {
-        is Ok -> true
+        is Success -> true
         is Failure -> false
     }
 ```
@@ -170,7 +170,7 @@ The `Parse` we used in previous example is just a typealias over it.
 
 ### What are Result and Parsed?
 Result is a simple sealed interface that models an operation that could fail. It has only two shapes:
-* `Ok(value)` models the success case
+* `Success(value)` models the success case
 * `Failure(error)` models the failure case
 
 It is a common type in Functional Programming and is also known as `Either`.
@@ -188,8 +188,8 @@ Let's say we have `Age` concept and we want to ensure that in a particular flow 
 ```kotlin
 import parsix.core.TerminalError
 import parsix.core.Parsed
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 
 @JvmInline
 value class Age(val value: UInt)
@@ -200,7 +200,7 @@ data class NotAdultError(val inp: Age) : TerminalError
 
 fun parseAdultAge(inp: Age): Parsed<AdultAge> =
     if (inp.value >= 18)
-        Ok(AdultAge(inp.value))
+        Success(AdultAge(inp.value))
     else
         Failure(NotAdultError(inp))
 ```
@@ -233,8 +233,8 @@ import parsix.core.Parsed
 import parsix.core.ParseError
 import parsix.core.TerminalError
 import parsix.core.parseBetween
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 
 /** Make it type-safe to use this value after parsing */
 @JvmInline
@@ -248,8 +248,8 @@ val parseLength: Parse<Int, Int> = parseBetween(3, 255)
 
 fun parseName(inp: String): Parsed<Name> =
     when (parsed = parseLength(inp.length)) {
-        is Ok ->
-            Ok(Name(inp))
+        is Success ->
+            Success(Name(inp))
 
         is Failure ->
             Failure(NameError(inp, parsed))
@@ -288,24 +288,24 @@ val rawUser = mapOf("name" to "Test", "age" to "42")
 ```
 This can be parsed easily:
 ```kotlin
-import parsix.core.carry
+import parsix.core.curry
 import parsix.core.ParseMap
 import parsix.core.parseInto
 import parsix.core.parseString
 import parsix.core.parseUInt
 import parsix.core.greedy.required
 
-val parseUser: ParseMap<User> = parseInto(::User.carry())
+val parseUser: ParseMap<User> = parseInto(::User.curry())
         .required("name", ::parseString.map(::Name))
         .required("age", ::parseUInt.map(::Age))
 ```
-One important thing to note is `::User.carry()`: it will destruct `User` constructor into multiple functions, each receiving a single argument.
+One important thing to note is `::User.curry()`: it will destruct `User` constructor into multiple functions, each receiving a single argument.
 Each `required` call *plucks* away one argument and is completely type-safe, the compiler will complain if types do not match; by having a specific type for each argument we also ensure that we cannot swap lines.
 
 The following will not compile:
 ```kotlin
 val parseUser: ParseMap<User> =
-    parseInto(::User.carry())
+    parseInto(::User.curry())
         .required("age", ::parseUInt.map(::Age)) // <- expected type Name, got Age
         .required("name", ::parseString.map(::Name))
 ```
@@ -320,7 +320,7 @@ data class RawUser(val name: String, val age: String)
 We can use `parseInto` again, but with a slight variation:
 ```kotlin
 val parseUser: Parse<RawUser, User> = 
-    parseInto(RawUser::class, ::User.carry())
+    parseInto(RawUser::class, ::User.curry())
         .required(RawUser::name, ::parseString.map(::Name))
         .required(RawUser::age, ::parseUInt.map(::Age))
 ```
@@ -482,7 +482,7 @@ package app.http.signup
 
 fun signupEndpoint(request: Map<String, Any?>): Response {
     when (val parsed = Signup.parse(request)) {
-        is Ok ->
+        is Success ->
             signup(parsed.value)
             response(HttpStatus.Created)
         is Failure ->
@@ -517,7 +517,7 @@ data class Signup private constructor(val email: Email, val password: Password) 
             password: Password, verify: String
         ): Parsed<Signup> =
             if (verify == pass.unwrap)
-                Ok(Signup(email, pass))
+                Success(Signup(email, pass))
             else
                 Failure(PasswordDoesntMatchError())
     }

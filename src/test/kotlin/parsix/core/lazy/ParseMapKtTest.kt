@@ -1,5 +1,7 @@
 package parsix.core.lazy
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import parsix.core.KeyError
@@ -9,8 +11,6 @@ import parsix.core.parseInt
 import parsix.core.parseInto
 import parsix.core.parseString
 import parsix.core.succeed
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
 import parsix.test.TestError
 import parsix.test.neverCalled
 
@@ -20,7 +20,7 @@ internal class ParseMapKtTest {
     @Test
     fun `it successfully parses the input`() {
         assertEquals(
-            Ok(TestData("Hello", null)),
+            Success(TestData("Hello", null)),
             parseInto(::TestData.curry())
                 .lazyRequired("1st", ::parseString)
                 .lazyOptional("snd", ::parseInt)
@@ -47,7 +47,7 @@ internal class ParseMapKtTest {
     @Test
     fun `optional fields can be omitted`() {
         assertEquals(
-            Ok(TestData("ok", null)),
+            Success(TestData("ok", null)),
             parseInto(::TestData.curry())
                 .lazyRequired("1st", succeed("ok"))
                 .lazyOptional("snd", neverCalled())

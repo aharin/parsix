@@ -1,10 +1,10 @@
 package parsix.test
 
+import dev.forkhandles.result4k.Failure
 import org.junit.jupiter.api.Assertions.fail
 import parsix.core.Parse
 import parsix.core.ParseError
 import parsix.core.TerminalError
-import parsix.fp.result.Failure
 
 fun <I, O> neverCalled(): Parse<I, O> =
     { _ -> fail("it shouldn't have been called") }

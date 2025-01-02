@@ -1,14 +1,15 @@
 package parsix.core
 
-import parsix.fp.result.Result
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 
 /**
  * Model the result of a [Parse]
  *
- * @see Ok
+ * @see Success
  * @see ParseError
  */
-typealias Parsed<T> = Result<ParseError, T>
+typealias Parsed<T> = Result<T, ParseError>
 
 /**
  * Base interface for modeling parse errors
@@ -42,8 +43,9 @@ class ManyErrors(errors: Set<ParseError>) : ParseError {
         // this assignment ensures `when` will complain in case there is a missing branch
         @Suppress("UNUSED_VARIABLE")
         val x = when (err) {
-            is TerminalError, is CompositeError  ->
+            is TerminalError, is CompositeError ->
                 this.errors.add(err)
+
             is ManyErrors ->
                 this.errors.addAll(err.errors)
         }

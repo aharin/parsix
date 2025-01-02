@@ -1,10 +1,10 @@
 package parsix.core.greedy
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import parsix.core.Parse
 import parsix.core.Parsed
 import parsix.core.combineErrors
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
 
 /**
  * This is the building block for complex data structures.
@@ -15,11 +15,11 @@ import parsix.fp.result.Ok
  *
  * This combinator will greedily parse the input and collect all errors into a [ManyErrors][parsix.core.ManyErrors].
  *
- * @see parseInto
+ * @see parsix.core.parseInto
  */
 fun <I, A, B> Parse<I, (A) -> B>.greedyPluck(parse: Parse<I, A>): Parse<I, B> =
     { inp ->
-        lift2(this(inp), parse(inp)) { f, a -> Ok(f(a)) }
+        lift2(this(inp), parse(inp)) { f, a -> Success(f(a)) }
     }
 
 @JvmName("greedyFlatPluck")
@@ -34,18 +34,21 @@ inline fun <A, B, O> lift2(
     crossinline f: (A, B) -> Parsed<O>
 ): Parsed<O> =
     when (pa) {
-        is Ok ->
+        is Success ->
             when (pb) {
-                is Ok ->
+                is Success ->
                     f(pa.value, pb.value)
+
                 is Failure ->
                     pb
             }
+
         is Failure ->
             when (pb) {
-                is Ok ->
+                is Success ->
                     pa
+
                 is Failure ->
-                    Failure(combineErrors(pa.error, pb.error))
+                    Failure(combineErrors(pa.reason, pb.reason))
             }
     }

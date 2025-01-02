@@ -1,17 +1,13 @@
 package parsix.core
 
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
-import parsix.fp.result.flatMap
-import parsix.fp.result.map
-import parsix.fp.result.mapError
+import dev.forkhandles.result4k.*
 
 /**
  * The building block of this library: a simple function that gets a single input
  * and returns a [Parsed]
  */
 typealias Parse<I, O> =
-        (input: I) -> Parsed<O>
+            (input: I) -> Parsed<O>
 
 /**
  * Combine two parsers, [parse] will use the parsed value of [this].
@@ -24,7 +20,7 @@ inline infix fun <I, T, O> Parse<I, T>.then(
 ): Parse<I, O> =
     { inp ->
         when (val parsed = this(inp)) {
-            is Ok ->
+            is Success ->
                 parse(parsed.value)
             is Failure ->
                 parsed
@@ -71,4 +67,4 @@ inline fun <I, T, O> Parse<I, T>.map(
 inline fun <I, O> Parse<I, O>.mapError(
     crossinline f: (ParseError) -> ParseError
 ): Parse<I, O> =
-    { inp -> this(inp).mapError(f) }
+    { inp -> this(inp).mapFailure(f) }

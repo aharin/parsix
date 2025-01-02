@@ -1,13 +1,12 @@
 import org.gradle.jvm.tasks.Jar
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "io.github.parsix"
 version = "0.1.0"
 
 plugins {
     // Apply the Kotlin JVM plugin to add support for Kotlin.
-    kotlin("jvm") version "1.5.0"
-    id("org.jetbrains.dokka") version "1.4.32"
+    kotlin("jvm") version "2.1.0"
+    id("org.jetbrains.dokka") version "2.0.0"
 
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
@@ -15,7 +14,7 @@ plugins {
     // needed for publication on maven central
     `maven-publish`
     signing
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
 repositories {
@@ -23,9 +22,8 @@ repositories {
 }
 
 sourceSets {
-    create("samples") {
-        compileClasspath += sourceSets.main.get().output
-        runtimeClasspath += sourceSets.main.get().output
+    test {
+        kotlin.srcDir("src/samples/kotlin")
     }
 }
 
@@ -36,14 +34,11 @@ dependencies {
     // Use the Kotlin JDK 8 standard library.
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
+    api("dev.forkhandles:result4k:2.20.0.0")
+
     testImplementation(platform("org.junit:junit-bom:5.7.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
-}
-
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    languageVersion = "1.5"
 }
 
 val dokkaDir = buildDir.resolve("docs")
@@ -51,7 +46,7 @@ tasks.dokkaHtml.configure {
     outputDirectory.set(dokkaDir)
     dokkaSourceSets {
         configureEach {
-            samples.from("test/kotlin", "samples/kotlin")
+            samples.from("$rootDir/src/test/kotlin", "$rootDir/src/samples/kotlin")
         }
     }
 }

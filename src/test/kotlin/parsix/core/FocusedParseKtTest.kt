@@ -1,9 +1,9 @@
 package parsix.core
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
 
 internal class FocusedParseKtTest {
     data class EmailUserError(
@@ -14,7 +14,7 @@ internal class FocusedParseKtTest {
     @Test
     fun `it parses the subsection`() {
         assertEquals(
-            Ok("hello@world.com"),
+            Success("hello@world.com"),
             parseEmailUser("hello@world.com")
         )
     }
@@ -30,7 +30,7 @@ internal class FocusedParseKtTest {
     private fun parseEmailUser(inp: String) =
         focusedParse(
             { it.split('@')[0] },
-            { if (it.length > 1) Ok(it) else Failure(RequiredError) },
+            { if (it.length > 1) Success(it) else Failure(RequiredError) },
             { it },
             ::EmailUserError
         )(inp)

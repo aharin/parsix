@@ -1,5 +1,7 @@
 package parsix.core.greedy
 
+import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.Failure
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import parsix.core.ManyErrors
@@ -7,8 +9,6 @@ import parsix.core.PropError
 import parsix.core.curry
 import parsix.core.parseInto
 import parsix.core.succeed
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
 import parsix.test.TestError
 
 internal class ParseObjKtTest {
@@ -18,7 +18,7 @@ internal class ParseObjKtTest {
     @Test
     fun `it successfully parses the object`() {
         assertEquals(
-            Ok(TestDst("ok", 10)),
+            Success(TestDst("ok", 10)),
             parseInto(TestSrc::class, ::TestDst.curry())
                 .required(TestSrc::a, succeed("ok"))
                 .optional(TestSrc::b, succeed(10))

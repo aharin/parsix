@@ -1,7 +1,8 @@
 package parsix.core
 
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
+import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.Failure
+
 
 /**
  * Focus on an aspect of the input and parse it.
@@ -16,9 +17,10 @@ inline fun <I, T, O> focusedParse(
     crossinline mapErr: (I, ParseError) -> ParseError,
 ): Parse<I, O> = { inp ->
     when (val parsed = parse(focus(inp))) {
-        is Ok ->
-            Ok(mapOk(inp))
+        is Success ->
+            Success(mapOk(inp))
+
         is Failure ->
-            Failure(mapErr(inp, parsed.error))
+            Failure(mapErr(inp, parsed.reason))
     }
 }

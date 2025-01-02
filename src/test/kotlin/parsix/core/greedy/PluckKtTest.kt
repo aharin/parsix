@@ -1,13 +1,13 @@
 package parsix.core.greedy
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import parsix.core.ManyErrors
 import parsix.core.curry
 import parsix.core.parseInto
 import parsix.core.succeed
-import parsix.fp.result.Failure
-import parsix.fp.result.Ok
 import parsix.test.TestError
 
 internal class PluckKtTest {
@@ -16,7 +16,7 @@ internal class PluckKtTest {
     @Test
     fun `it successfully parses the input`() {
         assertEquals(
-            Ok(TestData(10, "test")),
+            Success(TestData(10, "test")),
             parseInto(::TestData.curry())
                 .greedyPluck(succeed(10))
                 .greedyPluck(succeed("test"))
@@ -28,12 +28,12 @@ internal class PluckKtTest {
     fun `it greedily collects all errors`() {
         assertEquals(
             Failure(ManyErrors(
-                setOf(
-                    TestError("first"),
-                    TestError("second"),
-                )
+                    setOf(
+                        TestError("first"),
+                        TestError("second"),
+                    )
             )),
-            parseInto (::TestData.curry())
+            parseInto(::TestData.curry())
                 .greedyPluck(TestError.lift("first"))
                 .greedyPluck(TestError.lift("second"))
                 .invoke(mapOf())
